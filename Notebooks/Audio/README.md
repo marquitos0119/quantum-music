@@ -20,3 +20,5 @@
 
 ### Music/Sound
 * [How does sound work](https://web.stanford.edu/class/cs101/analog-digital-1.html): on frequency, amplitude, timbre, ...
+* [Frequencies of music notes](https://pages.mtu.edu/~suits/notefreqs.html#:~:text=Frequencies%20of%20Musical%20Notes%2C%20A4%20%3D%20440%20Hz)
+    * `A4 = 440 Hz`
