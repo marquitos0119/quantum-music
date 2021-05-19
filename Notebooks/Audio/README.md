@@ -4,7 +4,7 @@
 * `play-notes.ipynb`: a simple example on how to play a note in a notebook (from [Ann-Marie's post](https://ibm-quantumcomputing.slack.com/archives/C01QKGCF17C/p1619716259010600))
 * `notes-from-circuit.ipynb`: splits a circuit by column and plays the notes of each state vector
     * Splits the unit circle on a complex plane into eight parts (each part with angle `pi/4`) and assigns a note (pitch) by rounding to the nearest multiple of `pi/4`
-![C-scale example](c_scale_example.png)
+    <img src="c_scale_example.png" alt="drawing" width="75%"/>
 
 ## Useful Links
 
