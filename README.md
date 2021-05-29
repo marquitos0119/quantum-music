@@ -22,3 +22,10 @@ To install the `quantum-music` package locally, go to `Quantum-Music/` in this r
 pip install .
 ```
 This will also install other Python packages that are required for `quantum-music` to run.
+
+Once installed, the functions in `quantum-music` can be imported and directly called:
+```
+from quantum_music.circuit_functions import *
+```
+
+Note that in Python code `quantum_music` (note the underscore `_` in the name) should be used, but when installing the package use the name `quantum-music` (with a hyphen `-`).
