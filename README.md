@@ -33,7 +33,7 @@ Note that in Python code `quantum_music` (note the underscore `_` in the name) s
 ## Publish to Test PyPI
 When our Python package is uploaded to Test PyPI, the package can be used locally or in Quantum Lab. First you need an [account on Test PyPI](https://test.pypi.org/account/register/ ) then create an [API token](https://test.pypi.org/manage/account/#api-tokens). You should also setup your PyPI credentials (`.pypirc` file) locally to automatically use your token. See [How can I use API tokens to authenticate with PyPI?](https://test.pypi.org/help/#apitoken).
 
-1. Update the version number in `setup.cfg`:
+1. Update the version number in `setup.cfg` (use [semantic versioning](https://semver.org/)):
 ```
 [metadata]
 name = quantum-music
