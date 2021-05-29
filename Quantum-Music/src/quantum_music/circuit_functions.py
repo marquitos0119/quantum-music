@@ -3,53 +3,56 @@
 import numpy as np
 from numpy import pi
 
-from qiskit import QuantumCircuit, transpile, Aer, IBMQ, execute
-from qiskit.tools.jupyter import *
-from qiskit.visualization import *
-from ibm_quantum_widgets import *
+from qiskit import QuantumCircuit, Aer, execute
 from qiskit.visualization.utils import _get_layered_instructions
 
 # Additional imports for audio
 from time import sleep
-from IPython.display import Audio, display, clear_output
-from ipywidgets import widgets
-from functools import partial
+from IPython.display import Audio, display
 import matplotlib.pyplot as plt
 
 # Simulators
-state_vector_sim = Aer.get_backend('statevector_simulator')
-unitary_sim = Aer.get_backend('unitary_simulator')
+state_vector_sim = Aer.get_backend("statevector_simulator")
+unitary_sim = Aer.get_backend("unitary_simulator")
+
 
 # Utility functions
 def get_state_vector(circuit):
     return state_vector_sim.run(circuit).result().get_statevector()
 
+
 def get_unitary_matrix(circuit):
     return execute(circuit, unitary_sim).result().get_unitary()
+
 
 def get_amplitudes(matrix):
     return abs(matrix)
 
+
 def get_probabilities(matrix):
-    return abs(matrix**2)
+    return abs(matrix ** 2)
+
 
 def get_phases(matrix):
     return np.angle(matrix)
 
+
 # Pretty-printing
 def print_matrix(matrix):
-    print('Matrix shape ', matrix.shape)
+    print("Matrix shape ", matrix.shape)
     for row in matrix:
         for num in row:
-            print(f"{np.around(num, 2)}   ", end='')
-        print('')
-    print('\n---')
+            print(f"{np.around(num, 2)}   ", end="")
+        print("")
+    print("\n---")
 
-def print_vector(vector, comment=''):
-    print(f'Vector {comment} with shape {vector.shape}')
+
+def print_vector(vector, comment=""):
+    print(f"Vector {comment} with shape {vector.shape}")
     for num in vector:
         print(np.around(num, 2))
-    print('---')
+    print("---")
+
 
 def get_circuits_by_column(circuit):
     """circuit-splitter.ipynb"""
@@ -75,7 +78,7 @@ def get_circuits_by_column(circuit):
                 col = curr_column[index]
                 anchor_qubit = index
         if col == -1 or anchor_qubit == -1:
-            print('Something went wrong...')
+            print("Something went wrong...")
             continue
 
         columns[col].append((insn, qargs, cargs))
@@ -95,7 +98,9 @@ def get_circuits_by_column(circuit):
     assert len(sub_circuits) == num_columns
     return sub_circuits
 
+
 """Audio variables and functions"""
+
 
 def plot_sound(x, y, frequency, xlim=None):
     """
@@ -105,8 +110,9 @@ def plot_sound(x, y, frequency, xlim=None):
     # Zooms in so we can actually see the waves
     if xlim and len(xlim) == 2:
         plt.xlim(xlim[0], xlim[1])
-    plt.title(f'Frequency {frequency} Hz')
+    plt.title(f"Frequency {frequency} Hz")
     plt.plot(x, y)
+
 
 def play_notes(notes, merge=True, plot=False, volume=1.0):
     """
@@ -129,7 +135,7 @@ def play_notes(notes, merge=True, plot=False, volume=1.0):
                 y += yi
 
         if plot:
-            plot_sound(x, y, 'chord', xlim=[0.10, 0.15])
+            plot_sound(x, y, "chord", xlim=[0.10, 0.15])
 
         # Play sound and display widget
         display(Audio(y, rate=rate, autoplay=True))
@@ -142,33 +148,36 @@ def play_notes(notes, merge=True, plot=False, volume=1.0):
 
             # Play sound and display widget
             display(Audio(y, rate=rate, autoplay=True))
-            sleep(0.25) # Add delay between notes
+            sleep(0.25)  # Add delay between notes
+
 
 # Start with middle C = C4
 # Each note increments by a phase of pi/4
 # https://pages.mtu.edu/~suits/notefreqs.html#:~:text=Frequencies%20of%20Musical%20Notes%2C%20A4%20%3D%20440%20Hz
 c_scale = {
-    round(0, 2): ('C4', 261.63*2),
-    round(1*pi/4, 2): ('D4', 293.66*2),
-    round(2*pi/4, 2): ('E4', 329.63*2),
-    round(3*pi/4, 2): ('F4', 349.23*2),
-    round(4*pi/4, 2): ('G4', 392.00*2),
-    round(-3*pi/4, 2): ('A4', 440.00*2), # after pi, phases are negative
-    round(-2*pi/4, 2): ('B4', 493.88*2),
-    round(-1*pi/4, 2): ('C5', 523.25*2)
+    round(0, 2): ("C4", 261.63 * 2),
+    round(1 * pi / 4, 2): ("D4", 293.66 * 2),
+    round(2 * pi / 4, 2): ("E4", 329.63 * 2),
+    round(3 * pi / 4, 2): ("F4", 349.23 * 2),
+    round(4 * pi / 4, 2): ("G4", 392.00 * 2),
+    round(-3 * pi / 4, 2): ("A4", 440.00 * 2),  # after pi, phases are negative
+    round(-2 * pi / 4, 2): ("B4", 493.88 * 2),
+    round(-1 * pi / 4, 2): ("C5", 523.25 * 2),
 }
+
 
 def get_note(phase):
     """Return music note given a phase"""
     # Round to the nearest multiple of pi/4
-    base = pi/4
-    key = round(base * round(phase/base), 2)
+    base = pi / 4
+    key = round(base * round(phase / base), 2)
     if key not in c_scale:
-        print(f'{key} not in scale!')
+        print(f"{key} not in scale!")
         return None
 
     note = c_scale[key]
     return note
+
 
 def get_notes(state_vector):
     notes = []
@@ -177,3 +186,19 @@ def get_notes(state_vector):
         notes.append(get_note(phase))
 
     return notes
+
+
+def get_cummulative_state_vectors(sub_circuits):
+    """Get the state vectors at each column as if executed in order"""
+    if len(sub_circuits) == 0:
+        return []
+
+    state_vectors = [get_state_vector(sub_circuits[0])]
+    for i in range(1, len(sub_circuits)):
+        sub_circuit = sub_circuits[i]
+        unitary_matrix = get_unitary_matrix(sub_circuit)
+
+        # Multiply this column's unitary matrix with previous state_vector
+        state_vectors.append(np.matmul(unitary_matrix, state_vectors[i - 1]))
+
+    return state_vectors
