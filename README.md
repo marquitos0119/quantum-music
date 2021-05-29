@@ -31,7 +31,7 @@ from quantum_music.circuit_functions import *
 
 Note that in Python code `quantum_music` (note the underscore `_` in the name) should be used, but when installing the package use the name `quantum-music` (with a hyphen `-`). This will install the state of the code as is in the repository.
 
-### Install in Quantum Lab
+### Install in [Quantum Lab](https://quantum-computing.ibm.com/lab/)
 Install the latest published version in the Jupyter notebook:
 ```
 ! pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple quantum-music
