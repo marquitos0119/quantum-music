@@ -16,7 +16,8 @@ Once you are able to run Jupyter Notebooks on your system, you can start running
 * `Notebooks/`: code of our learning on Qiskit and audio in a Jupyter Notebook
 * `Quantum-Music/`: the Python package for users to use
 
-## Quantum-Music Local Installation
+## Quantum-Music Installation
+### Install locally from this repository
 To install the `quantum-music` package locally, go to `Quantum-Music/` in this repository, then run:
 ```
 pip install -e .
@@ -28,7 +29,13 @@ Once installed, the functions in `quantum-music` can be imported and directly ca
 from quantum_music.circuit_functions import *
 ```
 
-Note that in Python code `quantum_music` (note the underscore `_` in the name) should be used, but when installing the package use the name `quantum-music` (with a hyphen `-`).
+Note that in Python code `quantum_music` (note the underscore `_` in the name) should be used, but when installing the package use the name `quantum-music` (with a hyphen `-`). This will install the state of the code as is in the repository.
+
+### Install in Quantum Lab
+Install the latest published version in the Jupyter notebook:
+```
+! pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple quantum-music
+```
 
 ## Publish to Test PyPI
 When our Python package is uploaded to Test PyPI, the package can be used locally or in Quantum Lab. First you need an [account on Test PyPI](https://test.pypi.org/account/register/ ) then create an [API token](https://test.pypi.org/manage/account/#api-tokens). You should also setup your PyPI credentials (`.pypirc` file) locally to automatically use your token. See [How can I use API tokens to authenticate with PyPI?](https://test.pypi.org/help/#apitoken).
