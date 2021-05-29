@@ -1,6 +1,8 @@
 # Quantum Music Project
 The goal of this project is to design an alternative way for anyone interested in quantum computing to experience quantum state evolution through music.
 
+`quantum-music` as a pip-installable package: https://test.pypi.org/project/quantum-music/.
+
 ## Features
 - Intuitive user interface via Jupyter Notebooks
 - Optional tutorial with an overview of Quantum Computing
