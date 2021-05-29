@@ -19,7 +19,7 @@ Once you are able to run Jupyter Notebooks on your system, you can start running
 ## Quantum Music Installation/Packaging
 To install the `quantum-music` package locally, go to `Quantum-Music/` in this repository, then run:
 ```
-pip install .
+pip install -e .
 ```
 This will also install other Python packages that are required for `quantum-music` to run.
 
