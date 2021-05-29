@@ -3,4 +3,4 @@
 *.egg-info
 *__pycache__
 Quantum-Music/dist/
-
+Quantum-Music/build/
