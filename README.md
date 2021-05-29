@@ -14,7 +14,7 @@ Once you are able to run Jupyter Notebooks on your system, you can start running
 
 ## Directory Structure
 * `Notebooks/`: code of our learning on Qiskit and audio in a Jupyter Notebook
-* `Quantum-Music/`: the Python package for users to use
+* `Quantum-Music/`: the Python package for users to use. Note that everything in this directory will be available to the public!
 
 ## Quantum-Music Installation
 ### Install locally from this repository
