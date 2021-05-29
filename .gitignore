@@ -4,3 +4,4 @@
 *__pycache__
 Quantum-Music/dist/
 Quantum-Music/build/
+*.ipynb_checkpoints
