@@ -18,6 +18,22 @@ Once you are able to run Jupyter Notebooks on your system, you can start running
 
 ## Quantum-Music Installation
 ### Install locally from this repository
+First create a [Python virtual environment](https://docs.python.org/3/tutorial/venv.html#creating-virtual-environments). On Unix/Mac OS, run:
+```
+cd ~/
+python3 -m venv quantum-music-venv
+source quantum-music-venv/bin/activate
+```
+When developing/using `quantum-music`, activate the virtual environment:
+```
+source ~/quantum-music-venv/bin/activate
+```
+
+When the virtual environment is activated, your terminal should display the environment name:
+```
+(quantum-music-venv) user@machine ~ %
+```
+
 To install the `quantum-music` package locally, go to `Quantum-Music/` in this repository, then run:
 ```
 pip install -e .
