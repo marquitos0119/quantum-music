@@ -2,15 +2,12 @@
 
 import numpy as np
 from numpy import pi
-# Importing standard Qiskit libraries
+
 from qiskit import QuantumCircuit, transpile, Aer, IBMQ, execute
 from qiskit.tools.jupyter import *
 from qiskit.visualization import *
 from ibm_quantum_widgets import *
 from qiskit.visualization.utils import _get_layered_instructions
-
-# Loading your IBM Q account(s)
-#provider = IBMQ.load_account()
 
 # Additional imports for audio
 from time import sleep
@@ -18,8 +15,6 @@ from IPython.display import Audio, display, clear_output
 from ipywidgets import widgets
 from functools import partial
 import matplotlib.pyplot as plt
-
-"""Global variables and utility functions"""
 
 # Simulators
 state_vector_sim = Aer.get_backend('statevector_simulator')
@@ -49,13 +44,13 @@ def print_matrix(matrix):
             print(f"{np.around(num, 2)}   ", end='')
         print('')
     print('\n---')
-    
+
 def print_vector(vector, comment=''):
     print(f'Vector {comment} with shape {vector.shape}')
     for num in vector:
         print(np.around(num, 2))
     print('---')
-    
+
 def get_circuits_by_column(circuit):
     """circuit-splitter.ipynb"""
     # Get circuit metadata
@@ -63,15 +58,15 @@ def get_circuits_by_column(circuit):
     num_clbits = circuit.num_clbits
     _, _, ops = _get_layered_instructions(circuit)
     num_columns = len(ops)
-    
+
     # Initialize column information
     curr_column = [0] * num_qubits
     columns = []
     for i in range(num_columns):
         columns.append([])
-        
+
     # Organize instructions by column
-    for (insn, qargs, cargs) in circuit.data:    
+    for (insn, qargs, cargs) in circuit.data:
         col = -1
         anchor_qubit = -1
         for qubit in qargs:
@@ -88,7 +83,7 @@ def get_circuits_by_column(circuit):
         for qubit in qargs:
             index = qubit.index
             curr_column[index] = curr_column[anchor_qubit]
-        
+
     # Build the subcircuits by column
     sub_circuits = []
     for col in range(0, num_columns):
@@ -112,7 +107,7 @@ def plot_sound(x, y, frequency, xlim=None):
         plt.xlim(xlim[0], xlim[1])
     plt.title(f'Frequency {frequency} Hz')
     plt.plot(x, y)
-    
+
 def play_notes(notes, merge=True, plot=False, volume=1.0):
     """
     :param notes: a list of tuples of form (note, frequency)
@@ -122,7 +117,7 @@ def play_notes(notes, merge=True, plot=False, volume=1.0):
     rate = 16000.0
     duration = 1.25
     x = np.linspace(0.0, duration, int(rate * duration))
-    
+
     if merge:
         y = None
         for (note, frequency) in notes:
@@ -135,16 +130,16 @@ def play_notes(notes, merge=True, plot=False, volume=1.0):
 
         if plot:
             plot_sound(x, y, 'chord', xlim=[0.10, 0.15])
-        
+
         # Play sound and display widget
         display(Audio(y, rate=rate, autoplay=True))
-        
+
     else:
         for (note, frequency) in notes:
             y = volume * np.sin(frequency * 2.0 * np.pi * x)
             if plot:
                 plot_sound(x, y, frequency, xlim=[0.13, 0.15])
-            
+
             # Play sound and display widget
             display(Audio(y, rate=rate, autoplay=True))
             sleep(0.25) # Add delay between notes
@@ -171,9 +166,8 @@ def get_note(phase):
     if key not in c_scale:
         print(f'{key} not in scale!')
         return None
-    
+
     note = c_scale[key]
-    print(f'Phase {phase} maps to {note[0]}')
     return note
 
 def get_notes(state_vector):
@@ -181,8 +175,5 @@ def get_notes(state_vector):
     phases = get_phases(state_vector)
     for phase in phases:
         notes.append(get_note(phase))
-    
-    return notes
 
-def test():
-    print("it worked")
+    return notes
