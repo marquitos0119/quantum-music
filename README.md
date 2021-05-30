@@ -40,14 +40,14 @@ To install the `quantum-music` package locally, go to `Quantum-Music/` in this r
 ```
 pip install -e .
 ```
-This will also install other Python packages that are required for `quantum-music` to run.
+This will also install other Python packages that are required for `quantum-music` to run. This will install the state of the code as is in the repository. Code can be edited directly in this repository and the changes will be reflected when the Python interpreter (or Jupyter notebook kernel) is restarted.
 
 Once installed, the functions in `quantum-music` can be imported and directly called:
 ```
 from quantum_music.circuit_functions import *
 ```
 
-Note that in Python code `quantum_music` (note the underscore `_` in the name) should be used, but when installing the package use the name `quantum-music` (with a hyphen `-`). This will install the state of the code as is in the repository.
+Note that in Python code `quantum_music` (note the underscore `_` in the name) should be used, but when installing the package use the name `quantum-music` (with a hyphen `-`).
 
 ### Install in [Quantum Lab](https://quantum-computing.ibm.com/lab/)
 Install the latest published version in the Jupyter notebook:
