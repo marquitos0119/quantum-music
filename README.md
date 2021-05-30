@@ -44,7 +44,7 @@ This will also install other Python packages that are required for `quantum-musi
 
 Once installed, the functions in `quantum-music` can be imported and directly called:
 ```
-from quantum_music.circuit_functions import *
+from quantum_music.circuit_functions import get_phases, get_amplitudes
 ```
 
 Note that in Python code `quantum_music` (note the underscore `_` in the name) should be used, but when installing the package use the name `quantum-music` (with a hyphen `-`).
