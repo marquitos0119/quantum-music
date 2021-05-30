@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+from quantum_music.display import get_output_widget
+
 import numpy as np
 from numpy import pi
 
@@ -35,6 +37,35 @@ def get_probabilities(matrix):
 
 def get_phases(matrix):
     return np.angle(matrix)
+
+
+def get_example_circuit():
+    """Example circuit to use in testing"""
+    qasm = """
+    OPENQASM 2.0;
+    include "qelib1.inc";
+
+    qreg q[3];
+    creg c[3];
+
+    h q[0];
+    h q[1];
+    s q[0];
+    s q[1];
+    t q[0];
+    s q[1];
+    tdg q[0];
+    cx q[1],q[2];
+    t q[0];
+    s q[1];
+    h q[1];
+    cx q[0],q[1];
+    t q[0];
+    h q[1];
+    t q[0];
+    """
+
+    return QuantumCircuit.from_qasm_str(qasm)
 
 
 # Pretty-printing
@@ -149,6 +180,41 @@ def play_notes(notes, merge=True, plot=False, volume=1.0):
             # Play sound and display widget
             display(Audio(y, rate=rate, autoplay=True))
             sleep(0.25)  # Add delay between notes
+
+
+def play_notes_from_state_vector(state_vector, show_vectors=False, use_volume=True):
+    notes = get_notes(state_vector)
+    volumes = get_probabilities(state_vector)
+    if show_vectors:
+        print_vector(state_vector, comment="state vector")
+        print_vector(get_phases(state_vector), comment="phases")
+        print_vector(volumes, comment="amplitudes")
+
+    if len(notes) != len(volumes):
+        print("Number of phases and amplitudes do not match")
+        return
+
+    rate = 16000.0
+    duration = 1.25
+    x = np.linspace(0.0, duration, int(rate * duration))
+    y = None
+
+    for i, (note, frequency) in enumerate(notes):
+        yi = np.sin(frequency * 2.0 * np.pi * x)
+        if use_volume:
+            yi *= volumes[i]
+
+        if y is None:
+            y = yi
+        else:
+            y += yi
+
+    hide_audio_player = get_output_widget()
+    hide_audio_player.layout.visibility = "hidden"
+    with hide_audio_player:
+        display(Audio(y, rate=rate, autoplay=True))
+
+    hide_audio_player
 
 
 # Start with middle C = C4

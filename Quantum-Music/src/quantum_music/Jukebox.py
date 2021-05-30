@@ -1,17 +1,19 @@
 from time import sleep
+from warnings import filterwarnings, resetwarnings
 
+from matplotlib._api.deprecation import MatplotlibDeprecationWarning
 from IPython.display import display, clear_output
 from ipywidgets import widgets
-import numpy as np
 from qiskit import QuantumCircuit
+from qiskit.visualization import plot_state_qsphere
 
 from quantum_music.circuit_functions import (
-    get_state_vector,
-    get_unitary_matrix,
+    get_cummulative_state_vectors,
     get_circuits_by_column,
     play_notes,
     get_notes,
 )
+from quantum_music.display import get_output_widget
 
 
 class Jukebox:
@@ -24,32 +26,24 @@ class Jukebox:
 
         self.load_circuit(circuit)
 
+        # Ignore warnings that come from Qiskit visualizations
+        filterwarnings("ignore", category=MatplotlibDeprecationWarning)
         # Display UI controls
         self.display()
+
+    def __del__(self):
+        # Re-enable warnings from Qiskit visualizations
+        resetwarnings()
 
     def refresh_output(self):
         """Removes previous output and refreshes the button controls"""
         clear_output(wait=True)
         self.display()
 
-    def get_cummulative_state_vectors(self, sub_circuits):
-        if len(sub_circuits) == 0:
-            return []
-
-        state_vectors = [get_state_vector(sub_circuits[0])]
-        for i in range(1, len(sub_circuits)):
-            sub_circuit = sub_circuits[i]
-            unitary_matrix = get_unitary_matrix(sub_circuit)
-
-            # Multiply this column's unitary matrix with previous state_vector
-            state_vectors.append(np.matmul(unitary_matrix, state_vectors[i - 1]))
-
-        return state_vectors
-
     def load_circuit(self, circuit: QuantumCircuit):
         """Overwrite the current circuit with the new circuit"""
         self.sub_circuits = get_circuits_by_column(circuit)
-        self.state_vectors = self.get_cummulative_state_vectors(self.sub_circuits)
+        self.state_vectors = get_cummulative_state_vectors(self.sub_circuits)
 
     def play(self, button):
         self.refresh_output()
@@ -69,7 +63,6 @@ class Jukebox:
             return
         self.refresh_output()
         self.index = 0
-        print(f"Column={self.index}")
 
     def back(self, button):
         if self.index == 0:
@@ -77,7 +70,6 @@ class Jukebox:
         self.refresh_output()
         self.index -= 1
         self.play(button)
-        print(f"Column={self.index}")
 
     def forward(self, button):
         if self.index == len(self.sub_circuits) - 1:
@@ -85,32 +77,45 @@ class Jukebox:
         self.refresh_output()
         self.index += 1
         self.play(button)
-        print(f"Column={self.index}")
 
     def get_buttons(self):
+        play_all_from_button = widgets.Button(
+            icon="play-circle", tooltip="Automatically play all columns"
+        )
+        play_all_from_button.on_click(self.play_all_from)
+        play_all_from_button.style.button_color = "lightgreen"
+
         restart_button = widgets.Button(icon="fast-backward", tooltip="Restart to beginning")
         restart_button.on_click(self.restart)
 
-        back_button = widgets.Button(icon="backward")
+        back_button = widgets.Button(icon="backward", tooltip="Go back a column and play")
         back_button.on_click(self.back)
 
-        play_button = widgets.Button(icon="play")
+        play_button = widgets.Button(icon="play", tooltip="Play one column")
         play_button.on_click(self.play)
 
-        play_all_from_button = widgets.Button(
-            icon="play-circle", tooltip="Automatically play to the end"
-        )
-        play_all_from_button.on_click(self.play_all_from)
-
-        forward_button = widgets.Button(icon="forward")
+        forward_button = widgets.Button(icon="forward", tooltip="Go forward a column and play")
         forward_button.on_click(self.forward)
 
-        return [restart_button, back_button, play_button, play_all_from_button, forward_button]
+        # Defines the display order from left to right
+        return [play_all_from_button, restart_button, back_button, play_button, forward_button]
 
     def display(self):
         """Display the audio controls UI"""
-        # Display in HBox
-        display(self.circuit.draw())
-        display(self.sub_circuits[self.index].draw())
+
+        # Left HBox
+        circuit_output = get_output_widget()
+        with circuit_output:
+            display(self.circuit.draw())
+            display(self.sub_circuits[self.index].draw())
+            print(f"Column {self.index}")
+
+        # Right HBox
+        qsphere_output = get_output_widget()
+        with qsphere_output:
+            display(plot_state_qsphere(self.state_vectors[self.index]))
+        display(widgets.HBox([circuit_output, qsphere_output]))
+
+        # Control buttons
         buttons = widgets.HBox(self.buttons)
         display(buttons)
