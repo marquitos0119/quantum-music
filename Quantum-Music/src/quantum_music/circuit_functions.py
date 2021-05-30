@@ -1,7 +1,5 @@
 #!/usr/bin/python3
 
-from quantum_music.display import get_output_widget
-
 import numpy as np
 from numpy import pi
 
@@ -209,12 +207,18 @@ def play_notes_from_state_vector(state_vector, show_vectors=False, use_volume=Tr
         else:
             y += yi
 
-    hide_audio_player = get_output_widget()
-    hide_audio_player.layout.visibility = "hidden"
-    with hide_audio_player:
-        display(Audio(y, rate=rate, autoplay=True))
+    display(Audio(y, rate=rate, autoplay=True))
 
-    hide_audio_player
+    # TODO: can't seem to get rid of the audio UI
+    # hide_audio_player = get_output_widget()
+    # hide_audio_player.layout.visibility = "none"
+    # with hide_audio_player:
+    #    display(Audio(y, rate=rate, autoplay=True))
+    #    display(Audio(y, rate=rate, autoplay=True))
+    #    print('sheiße')
+    # hide_audio_player.layout.visibility = "none"
+
+    # HBox([hide_audio_player])
 
 
 # Start with middle C = C4
