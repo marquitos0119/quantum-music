@@ -146,9 +146,10 @@ def plot_sound(x, y, frequency, xlim=None):
 class InvisibleAudio(Audio):
     def _repr_html_(self):
         audio = super()._repr_html_()
-        audio = audio.replace('<audio', f'<audio onended="this.parentNode.removeChild(this)"')
-        return f'<div style="display:none">{audio}</div>'    
-    
+        audio = audio.replace("<audio", '<audio onended="this.parentNode.removeChild(this)"')
+        return f'<div style="display:none">{audio}</div>'
+
+
 def play_notes(notes, merge=True, plot=False, volume=1.0):
     """
     :param notes: a list of tuples of form (note, frequency)
@@ -174,7 +175,6 @@ def play_notes(notes, merge=True, plot=False, volume=1.0):
 
         # Play sound and display widget
         display(InvisibleAudio(y, rate=rate, autoplay=True))
-        
 
     else:
         for (note, frequency) in notes:
@@ -214,18 +214,7 @@ def play_notes_from_state_vector(state_vector, show_vectors=False, use_volume=Tr
         else:
             y += yi
 
-    display(Audio(y, rate=rate, autoplay=True))
-
-    # TODO: can't seem to get rid of the audio UI
-    # hide_audio_player = get_output_widget()
-    # hide_audio_player.layout.visibility = "none"
-    # with hide_audio_player:
-    #    display(Audio(y, rate=rate, autoplay=True))
-    #    display(Audio(y, rate=rate, autoplay=True))
-    #    print('sheiße')
-    # hide_audio_player.layout.visibility = "none"
-
-    # HBox([hide_audio_player])
+    display(InvisibleAudio(y, rate=rate, autoplay=True))
 
 
 # Start with middle C = C4
