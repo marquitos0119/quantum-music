@@ -143,6 +143,12 @@ def plot_sound(x, y, frequency, xlim=None):
     plt.plot(x, y)
 
 
+class InvisibleAudio(Audio):
+    def _repr_html_(self):
+        audio = super()._repr_html_()
+        audio = audio.replace('<audio', f'<audio onended="this.parentNode.removeChild(this)"')
+        return f'<div style="display:none">{audio}</div>'    
+    
 def play_notes(notes, merge=True, plot=False, volume=1.0):
     """
     :param notes: a list of tuples of form (note, frequency)
@@ -167,7 +173,8 @@ def play_notes(notes, merge=True, plot=False, volume=1.0):
             plot_sound(x, y, "chord", xlim=[0.10, 0.15])
 
         # Play sound and display widget
-        display(Audio(y, rate=rate, autoplay=True))
+        display(InvisibleAudio(y, rate=rate, autoplay=True))
+        
 
     else:
         for (note, frequency) in notes:
