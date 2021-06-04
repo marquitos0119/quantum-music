@@ -150,28 +150,31 @@ class InvisibleAudio(Audio):
         return f'<div style="display:none">{audio}</div>'
 
 
-def play_notes(notes, merge=True, plot=False, volume=1.0):
+def play_notes(columns, merge=True, plot=False, volume=1.0):
     """
     :param notes: a list of tuples of form (note, frequency)
     :param merge: if True, play notes simultaneously, else sequentially
     :param plot: if True, display a graph of the frequencies
     """
     rate = 16000.0
-    duration = 1.25
+    duration = 1
     x = np.linspace(0.0, duration, int(rate * duration))
+    fullx = np.linspace(0.0, duration * len(columns), int(rate * duration))
 
     if merge:
         y = None
-        for (note, frequency) in notes:
-            yi = np.sin(frequency * 2.0 * np.pi * x)
-            yi *= volume
-            if y is None:
-                y = yi
-            else:
-                y += yi
+        for i,column in enumerate(columns):
+            offset = float(i) * duration
+            for (note, frequency) in column:
+                yi = np.sin((frequency * 2.0 * np.pi * x) - offset)
+                yi *= volume
+                if y is None:
+                    y = yi
+                else:
+                    y += yi
 
         if plot:
-            plot_sound(x, y, "chord", xlim=[0.10, 0.15])
+            plot_sound(fullx, y, "chord")
 
         # Play sound and display widget
         display(InvisibleAudio(y, rate=rate, autoplay=True))
