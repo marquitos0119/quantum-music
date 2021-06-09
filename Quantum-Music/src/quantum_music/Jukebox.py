@@ -2,7 +2,7 @@ from time import sleep
 from warnings import filterwarnings, resetwarnings
 
 from matplotlib._api.deprecation import MatplotlibDeprecationWarning
-from IPython.display import display, clear_output
+from IPython.display import display, clear_output, HTML
 from ipywidgets import widgets
 from qiskit import QuantumCircuit
 from qiskit.visualization import plot_state_qsphere
@@ -109,7 +109,7 @@ class Jukebox:
             # Entire circuit
             display(self.circuit.draw())
             # One column
-            print(f"Column {self.index}")
+            display(HTML(f"<h3>Column {self.index}</h3>"))
             display(self.sub_circuits[self.index].draw())
 
         # Right HBox
