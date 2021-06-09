@@ -106,9 +106,11 @@ class Jukebox:
         # Left HBox
         circuit_output = get_output_widget()
         with circuit_output:
+            # Entire circuit
             display(self.circuit.draw())
-            display(self.sub_circuits[self.index].draw())
+            # One column
             print(f"Column {self.index}")
+            display(self.sub_circuits[self.index].draw())
 
         # Right HBox
         qsphere_output = get_output_widget()
