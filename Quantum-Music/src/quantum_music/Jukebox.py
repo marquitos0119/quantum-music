@@ -23,6 +23,7 @@ class Jukebox:
         self.sub_circuits = None
         self.state_vectors = None
         self.buttons = self.get_buttons()
+        self.notes = []
 
         self.load_circuit(circuit)
 
@@ -44,11 +45,12 @@ class Jukebox:
         """Overwrite the current circuit with the new circuit"""
         self.sub_circuits = get_circuits_by_column(circuit)
         self.state_vectors = get_cummulative_state_vectors(self.sub_circuits)
+        self.notes = get_notes(self.state_vectors[self.index])
 
     def play(self, button):
+        self.notes = get_notes(self.state_vectors[self.index])
         self.refresh_output()
-        notes = get_notes(self.state_vectors[self.index])
-        play_notes(notes)
+        play_notes(self.notes)
 
     def play_all_from(self, button):
         for i in range(self.index, len(self.state_vectors)):
@@ -61,8 +63,9 @@ class Jukebox:
         """Moves back to the first column"""
         if self.index == 0:
             return
-        self.refresh_output()
         self.index = 0
+        self.notes = get_notes(self.state_vectors[self.index])
+        self.refresh_output()
 
     def back(self, button):
         if self.index == 0:
@@ -105,11 +108,13 @@ class Jukebox:
 
         # Left HBox
         circuit_output = get_output_widget()
+        notes_str = ",".join([note[0] for note in self.notes])
         with circuit_output:
             # Entire circuit
             display(self.circuit.draw())
             # One column
             display(HTML(f"<h3>Column {self.index}</h3>"))
+            display(HTML(f"<p><b>Notes played</b>: {notes_str}</p>"))
             display(self.sub_circuits[self.index].draw())
 
         # Right HBox
