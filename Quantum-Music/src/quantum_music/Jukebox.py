@@ -46,6 +46,10 @@ class Jukebox:
         clear_output(wait=True)
         self.display()
 
+    def get_current_state_vector(self):
+        """Returns the current column's state vector"""
+        return self.state_vectors[self.index]
+
     def get_notes(self):
         """Helper function"""
         return get_notes(
