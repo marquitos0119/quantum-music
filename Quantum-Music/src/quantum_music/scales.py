@@ -43,7 +43,7 @@ def get_scale(start_note, pi_division=4):
         steps_from_start += major_scale_steps[step_index]
         phase = round(i * pi / pi_division, 2)
 
-        # Each half-step is 2^(1/12) away
+        # Each half-step is 2^(1/12)
         scale[phase] = (f"{steps_from_start}", round(frequency * (2 ** (steps_from_start / 12)), 2))
 
         step_index = (step_index + 1) % len(major_scale_steps)
