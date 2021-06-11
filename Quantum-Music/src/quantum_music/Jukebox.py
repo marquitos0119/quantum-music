@@ -14,16 +14,21 @@ from quantum_music.circuit_functions import (
     get_notes,
 )
 from quantum_music.display import get_output_widget
+from quantum_music.scales import get_scale
 
 
 class Jukebox:
-    def __init__(self, circuit: QuantumCircuit):
+    def __init__(self, circuit: QuantumCircuit, start_note=("C5", 523.25), pi_division=4):
         self.index = 0
         self.circuit = circuit
         self.sub_circuits = None
         self.state_vectors = None
         self.buttons = self.get_buttons()
         self.notes = []
+
+        # Adjust scale
+        self.scale = get_scale(start_note, pi_division=pi_division)
+        self.pi_division = pi_division
 
         self.load_circuit(circuit)
 
@@ -41,14 +46,20 @@ class Jukebox:
         clear_output(wait=True)
         self.display()
 
+    def get_notes(self):
+        """Helper function"""
+        return get_notes(
+            self.state_vectors[self.index], scale=self.scale, pi_division=self.pi_division
+        )
+
     def load_circuit(self, circuit: QuantumCircuit):
         """Overwrite the current circuit with the new circuit"""
         self.sub_circuits = get_circuits_by_column(circuit)
         self.state_vectors = get_cummulative_state_vectors(self.sub_circuits)
-        self.notes = get_notes(self.state_vectors[self.index])
+        self.notes = self.get_notes()
 
     def play(self, button):
-        self.notes = get_notes(self.state_vectors[self.index])
+        self.notes = self.get_notes()
         self.refresh_output()
         play_notes(self.notes)
 
@@ -64,7 +75,7 @@ class Jukebox:
         if self.index == 0:
             return
         self.index = 0
-        self.notes = get_notes(self.state_vectors[self.index])
+        self.notes = self.get_notes()
         self.refresh_output()
 
     def back(self, button):

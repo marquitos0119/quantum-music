@@ -31,3 +31,67 @@ class TestScales:
 
         for phase in scale:
             print(f"phase {phase}: freq={scale[phase]}")
+
+
+# class TestFromQASM:
+#    def test_pallet_town(self):
+#        """From James!"""
+#        qasm = """
+#        OPENQASM 2.0;
+#        include "qelib1.inc";
+#        qreg q[2];
+#        creg c[2];
+#        ry(13*pi/8) q[0];
+#        h q[1];
+#        h q[0];
+#        z q[0];
+#        barrier q[0],q[1];
+#        x q[1];
+#        cp(11*pi/8) q[1],q[0];
+#        x q[1];
+#        cp(2*pi/8) q[0],q[1];
+#        barrier q[0],q[1];
+#        x q[1];
+#        cp(15*pi/8) q[1],q[0];
+#        x q[1];
+#        cp(0) q[0],q[1];
+#        barrier q[0],q[1];
+#        x q[1];
+#        cp(15*pi/8) q[1],q[0];
+#        x q[1];
+#        cp(pi/8) q[0],q[1];
+#        barrier q[0],q[1];
+#        x q[1];
+#        cp(15*pi/8) q[1],q[0];
+#        x q[1];
+#        cp(0) q[0],q[1];
+#        barrier q[0],q[1];
+#        x q[1];
+#        cp(6*pi/8) q[1],q[0];
+#        x q[1];
+#        cp(2*pi/8) q[0],q[1];
+#        barrier q[0],q[1];
+#        x q[1];
+#        cp(14*pi/8) q[1],q[0];
+#        x q[1];
+#        cp(0) q[0],q[1];
+#        barrier q[0],q[1];
+#        x q[1];
+#        cp(pi/8) q[1],q[0];
+#        x q[1];
+#        cp(15*pi/8) q[0],q[1];
+#        barrier q[0],q[1];
+#        x q[1];
+#        cp(15*pi/8) q[1],q[0];
+#        x q[1];
+#        cp(0) q[0],q[1];
+#        barrier q[0],q[1];
+#        x q[1];
+#        cp(15*pi/8) q[1],q[0];
+#        x q[1];
+#        cp(14*pi/8) q[0],q[1];
+#        barrier q[0],q[1];
+#        """
+#
+#        circuit = QuantumCircuit.from_qasm_str(qasm)
+#

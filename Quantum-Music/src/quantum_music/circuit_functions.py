@@ -225,6 +225,11 @@ def get_note(phase, scale=c_scale, pi_division=4):
     # Round to the nearest multiple of pi/pi_division
     base = pi / pi_division
     key = round(base * round(phase / base), 2)
+
+    # Edge case where phase = -3.14
+    if key <= -3.14:
+        key = 0.0
+
     if key not in scale:
         print(f"{key} not in scale!")
         return None
@@ -233,11 +238,11 @@ def get_note(phase, scale=c_scale, pi_division=4):
     return note
 
 
-def get_notes(state_vector):
+def get_notes(state_vector, scale=c_scale, pi_division=4):
     notes = []
     phases = get_phases(state_vector)
     for phase in phases:
-        notes.append(get_note(phase))
+        notes.append(get_note(phase, scale=scale, pi_division=pi_division))
 
     return notes
 

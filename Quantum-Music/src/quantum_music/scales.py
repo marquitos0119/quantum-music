@@ -82,11 +82,11 @@ def get_scale(start_note, pi_division=4):
     """
 
     note_name_index, note_number = get_note_index(start_note)
-    print(
-        f"note={notes_by_name[note_name_index]}, "
-        f"note_name_index={note_name_index}, "
-        f"note_number={note_number}"
-    )
+    # print(
+    #    f"note={notes_by_name[note_name_index]}, "
+    #    f"note_name_index={note_name_index}, "
+    #    f"note_number={note_number}"
+    # )
 
     # Initialize first note
     frequency = start_note[1]
