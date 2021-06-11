@@ -11,6 +11,9 @@ from time import sleep
 from IPython.display import Audio, display
 import matplotlib.pyplot as plt
 
+from quantum_music.scales import c_scale
+
+
 # Simulators
 state_vector_sim = Aer.get_backend("statevector_simulator")
 unitary_sim = Aer.get_backend("unitary_simulator")
@@ -215,21 +218,6 @@ def play_notes_from_state_vector(state_vector, show_vectors=False, use_volume=Tr
             y += yi
 
     display(InvisibleAudio(y, rate=rate, autoplay=True))
-
-
-# Start with middle C = C4
-# Each note increments by a phase of pi/4
-# https://pages.mtu.edu/~suits/notefreqs.html#:~:text=Frequencies%20of%20Musical%20Notes%2C%20A4%20%3D%20440%20Hz
-c_scale = {
-    round(0, 2): ("C4", 261.63 * 2),
-    round(1 * pi / 4, 2): ("D4", 293.66 * 2),
-    round(2 * pi / 4, 2): ("E4", 329.63 * 2),
-    round(3 * pi / 4, 2): ("F4", 349.23 * 2),
-    round(4 * pi / 4, 2): ("G4", 392.00 * 2),
-    round(-3 * pi / 4, 2): ("A4", 440.00 * 2),  # after pi, phases are negative
-    round(-2 * pi / 4, 2): ("B4", 493.88 * 2),
-    round(-1 * pi / 4, 2): ("C5", 523.25 * 2),
-}
 
 
 def get_note(phase):
