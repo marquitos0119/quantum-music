@@ -14,6 +14,17 @@ c_scale = {
     round(-1 * pi / 4, 2): ("C6", 523.25 * 2),
 }
 
+g_scale = {
+    round(0, 2): ("G5", 783.99),
+    round(1 * pi / 4, 2): ("A5", 880.00),
+    round(2 * pi / 4, 2): ("B5", 987.77),
+    round(3 * pi / 4, 2): ("C6", 1046.50),
+    round(4 * pi / 4, 2): ("D6", 1174.66),
+    round(-3 * pi / 4, 2): ("E6", 1318.51),  # after pi, phases are negative
+    round(-2 * pi / 4, 2): ("F#6", 1479.98),
+    round(-1 * pi / 4, 2): ("G6", 1567.98),
+}
+
 # How to compute any major scale in terms of half-steps
 # All major scales follow: W W H W W W H
 major_scale_steps = [2, 2, 1, 2, 2, 2, 1]
