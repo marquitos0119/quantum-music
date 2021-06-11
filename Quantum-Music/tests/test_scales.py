@@ -15,6 +15,12 @@ class TestScales:
         scale = get_scale(start_note, pi_division=4)
 
         for phase in g_scale:
-            print(f"phase: {phase}")
             freq_diff = scale[phase][1] - g_scale[phase][1]
             assert freq_diff < 0.1
+
+    def test_g_scale_div_8(self):
+        start_note = ("G5", 783.99)
+        scale = get_scale(start_note, pi_division=8)
+
+        for phase in scale:
+            print(f"phase {phase}: freq={scale[phase]}")
