@@ -220,16 +220,16 @@ def play_notes_from_state_vector(state_vector, show_vectors=False, use_volume=Tr
     display(InvisibleAudio(y, rate=rate, autoplay=True))
 
 
-def get_note(phase):
+def get_note(phase, scale=c_scale):
     """Return music note given a phase"""
     # Round to the nearest multiple of pi/4
     base = pi / 4
     key = round(base * round(phase / base), 2)
-    if key not in c_scale:
+    if key not in scale:
         print(f"{key} not in scale!")
         return None
 
-    note = c_scale[key]
+    note = scale[key]
     return note
 
 
