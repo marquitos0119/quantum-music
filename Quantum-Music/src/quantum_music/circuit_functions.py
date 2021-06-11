@@ -222,7 +222,7 @@ def play_notes_from_state_vector(state_vector, show_vectors=False, use_volume=Tr
 
 def get_note(phase, scale=c_scale, pi_division=4):
     """Return music note given a phase"""
-    # Round to the nearest multiple of pi/4
+    # Round to the nearest multiple of pi/pi_division
     base = pi / pi_division
     key = round(base * round(phase / base), 2)
     if key not in scale:
