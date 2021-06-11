@@ -1,17 +1,17 @@
 from numpy import pi
 
-# Start with middle C = C4
+# Middle C = C4
 # Each note increments by a phase of pi/4
 # https://pages.mtu.edu/~suits/notefreqs.html#:~:text=Frequencies%20of%20Musical%20Notes%2C%20A4%20%3D%20440%20Hz
 c_scale = {
-    round(0, 2): ("C4", 261.63 * 2),
-    round(1 * pi / 4, 2): ("D4", 293.66 * 2),
-    round(2 * pi / 4, 2): ("E4", 329.63 * 2),
-    round(3 * pi / 4, 2): ("F4", 349.23 * 2),
-    round(4 * pi / 4, 2): ("G4", 392.00 * 2),
-    round(-3 * pi / 4, 2): ("A4", 440.00 * 2),  # after pi, phases are negative
-    round(-2 * pi / 4, 2): ("B4", 493.88 * 2),
-    round(-1 * pi / 4, 2): ("C5", 523.25 * 2),
+    round(0, 2): ("C5", 261.63 * 2),
+    round(1 * pi / 4, 2): ("D5", 293.66 * 2),
+    round(2 * pi / 4, 2): ("E5", 329.63 * 2),
+    round(3 * pi / 4, 2): ("F5", 349.23 * 2),
+    round(4 * pi / 4, 2): ("G5", 392.00 * 2),
+    round(-3 * pi / 4, 2): ("A5", 440.00 * 2),  # after pi, phases are negative
+    round(-2 * pi / 4, 2): ("B5", 493.88 * 2),
+    round(-1 * pi / 4, 2): ("C6", 523.25 * 2),
 }
 
 # How to compute any major scale in terms of half-steps
@@ -44,7 +44,8 @@ def get_scale(start_note, pi_division=4):
         phase = round(i * pi / pi_division, 2)
 
         # Each half-step is 2^(1/12) away
-        scale[phase] = (f"{steps_from_start}", frequency * (2 ** (steps_from_start / 12)))
+        scale[phase] = (f"{steps_from_start}", round(frequency * (2 ** (steps_from_start / 12)), 2))
+
         step_index = (step_index + 1) % len(major_scale_steps)
 
     return scale
