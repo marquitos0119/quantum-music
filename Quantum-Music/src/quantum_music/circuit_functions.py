@@ -5,6 +5,7 @@ from numpy import pi
 
 from qiskit import QuantumCircuit, Aer, execute
 from qiskit.visualization.utils import _get_layered_instructions
+from qiskit.circuit.barrier import Barrier
 
 # Additional imports for audio
 from time import sleep
@@ -258,6 +259,10 @@ def get_cummulative_state_vectors(sub_circuits):
         unitary_matrix = get_unitary_matrix(sub_circuit)
 
         # Multiply this column's unitary matrix with previous state_vector
-        state_vectors.append(np.matmul(unitary_matrix, state_vectors[i - 1]))
+        index = len(state_vectors) - 1
+        state_vector = np.matmul(unitary_matrix, state_vectors[index])
+        for (insn, qargs, cargs) in sub_circuit.data:
+            if type(insn) == Barrier:
+                state_vectors.append(state_vector)
 
     return state_vectors

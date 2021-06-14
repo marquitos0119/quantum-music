@@ -1,11 +1,12 @@
 from time import sleep
 from warnings import filterwarnings, resetwarnings
 
-from matplotlib._api.deprecation import MatplotlibDeprecationWarning
+#from matplotlib._api.deprecation import MatplotlibDeprecationWarning
 from IPython.display import display, clear_output, HTML
 from ipywidgets import widgets
 from qiskit import QuantumCircuit
 from qiskit.visualization import plot_state_qsphere
+from qiskit.circuit.barrier import Barrier
 
 from quantum_music.circuit_functions import (
     get_cummulative_state_vectors,
@@ -33,7 +34,7 @@ class Jukebox:
         self.load_circuit(circuit)
 
         # Ignore warnings that come from Qiskit visualizations
-        filterwarnings("ignore", category=MatplotlibDeprecationWarning)
+        filterwarnings("ignore")
         # Display UI controls
         self.display()
 
@@ -63,9 +64,14 @@ class Jukebox:
         self.notes = self.get_notes()
 
     def play(self, button):
-        self.notes = self.get_notes()
-        self.refresh_output()
-        play_notes(self.notes)
+        circuit =  self.sub_circuits[self.index]
+        for (insn, qargs, cargs) in circuit.data:
+            if type(insn) == Barrier:
+                self.notes = self.get_notes()
+                self.refresh_output()
+                play_notes(self.notes)
+                print("barrier")
+                break;
 
     def play_all_from(self, button):
         for i in range(self.index, len(self.state_vectors)):
