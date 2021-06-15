@@ -141,7 +141,7 @@ class Jukebox:
         circuit_output = get_output_widget()
         notes_str = ",".join([note[0] for note in self.notes])
         with circuit_output:
-            if len(self.sub_circuits) < 10:
+            if len(self.sub_circuits) < 15:
                 # Entire circuit
                 display(self.circuit.draw())
             else:
