@@ -192,7 +192,7 @@ def play_notes(notes, merge=True, plot=False, volume=1.0):
     :param plot: if True, display a graph of the frequencies
     """
     rate = 16000.0
-    duration = 0.50
+    duration = 0.250
     x = np.linspace(0.0, duration, int(rate * duration))
 
     if merge:
@@ -219,7 +219,7 @@ def play_notes(notes, merge=True, plot=False, volume=1.0):
 
             # Play sound and display widget
             display(Audio(y, rate=rate, autoplay=True))
-            sleep(0.25)  # Add delay between notes
+            #sleep(0.25)  # Add delay between notes
 
 
 def play_notes_from_state_vector(state_vector, show_vectors=False, use_volume=True):

@@ -24,6 +24,7 @@ class Jukebox:
         start_note=("C5", 523.25),
         pi_division=4,
         by_barrier=False,
+        only_sound=False
     ):
         """
         :param circuit: the Qiskit circuit to play
@@ -51,16 +52,16 @@ class Jukebox:
         # Ignore warnings that come from Qiskit visualizations
         filterwarnings("ignore")
         # Display UI controls
-        self.display()
+        self.display(only_sound)
 
     def __del__(self):
         # Re-enable warnings from Qiskit visualizations
         resetwarnings()
 
-    def refresh_output(self):
+    def refresh_output(self, only_sound):
         """Removes previous output and refreshes the button controls"""
         clear_output(wait=True)
-        self.display()
+        self.display(only_sound)
 
     def get_current_state_vector(self):
         """Returns the current column's state vector"""
@@ -78,17 +79,24 @@ class Jukebox:
         self.state_vectors = get_cummulative_state_vectors(self.sub_circuits)
         self.notes = self.get_notes()
 
-    def play(self, button):
+    def play(self, button, only_sound):
         self.notes = self.get_notes()
-        self.refresh_output()
+        self.refresh_output(only_sound)
         play_notes(self.notes)
 
-    def play_all_from(self, button):
+    def play_all_from1(self, button, only_sound=False):
         for i in range(self.index, len(self.state_vectors)):
-            self.refresh_output()
+            self.refresh_output(only_sound)
             self.index = i
-            self.play(button)
-            sleep(1)
+            self.play(button, only_sound)
+            sleep(0.25)
+    
+    def play_all_from2(self, button, only_sound=True):
+        for i in range(self.index, len(self.state_vectors)):
+            self.refresh_output(only_sound)
+            self.index = i
+            self.play(button, only_sound)
+            sleep(0.25)
 
     def restart(self, button):
         """Moves back to the first column"""
@@ -116,7 +124,7 @@ class Jukebox:
         play_all_from_button = widgets.Button(
             icon="play-circle", tooltip="Automatically play all columns"
         )
-        play_all_from_button.on_click(self.play_all_from)
+        play_all_from_button.on_click(self.play_all_from1)
         play_all_from_button.style.button_color = "lightgreen"
 
         restart_button = widgets.Button(icon="fast-backward", tooltip="Restart to beginning")
@@ -134,30 +142,39 @@ class Jukebox:
         # Defines the display order from left to right
         return [play_all_from_button, restart_button, back_button, play_button, forward_button]
 
-    def display(self):
+    def display(self, only_sound):
         """Display the audio controls UI"""
 
-        # Left HBox
-        circuit_output = get_output_widget()
-        notes_str = ",".join([note[0] for note in self.notes])
-        with circuit_output:
-            # Entire circuit
-            display(self.circuit.draw())
-            # One column/barrier section
-            if self.by_barrier:
-                label = "Barrier"
-            else:
-                label = "Column"
-            display(HTML(f"<h3>{label} {self.index}</h3>"))
-            display(HTML(f"<p><b>Notes played</b>: {notes_str}</p>"))
-            display(self.sub_circuits[self.index].draw())
+        if only_sound == True:
+            play = widgets.Button(
+                icon="play-circle", tooltip="Automatically play all columns"
+            )
+            play.on_click(self.play_all_from2)
+            play.style.button_color = "lightgreen"
+            display(play)
+        else:
+            # Left HBox
+            circuit_output = get_output_widget()
+            notes_str = ",".join([note[0] for note in self.notes])
+            with circuit_output:
+                # Entire circuit
+                display(self.circuit.draw())
+                # One column/barrier section
+                if self.by_barrier:
+                    label = "Barrier"
+                else:
+                    label = "Column"
+                display(HTML(f"<h3>{label} {self.index}</h3>"))
+                display(HTML(f"<p><b>Notes played</b>: {notes_str}</p>"))
+                display(self.sub_circuits[self.index].draw())
 
-        # Right HBox
-        qsphere_output = get_output_widget()
-        with qsphere_output:
-            display(plot_state_qsphere(self.state_vectors[self.index]))
-        display(widgets.HBox([circuit_output, qsphere_output]))
+            # Right HBox
+            qsphere_output = get_output_widget()
+            with qsphere_output:
+                display(plot_state_qsphere(self.state_vectors[self.index]))
+            display(widgets.HBox([circuit_output, qsphere_output]))
 
-        # Control buttons
-        buttons = widgets.HBox(self.buttons)
-        display(buttons)
+            # Control buttons
+            buttons = widgets.HBox(self.buttons)
+            display(buttons)
+        
