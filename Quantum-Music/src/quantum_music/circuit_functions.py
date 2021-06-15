@@ -5,6 +5,7 @@ from numpy import pi
 
 from qiskit import QuantumCircuit, Aer, execute
 from qiskit.visualization.utils import _get_layered_instructions
+from qiskit.circuit.barrier import Barrier
 
 # Additional imports for audio
 from time import sleep
@@ -86,8 +87,12 @@ def print_vector(vector, comment=""):
     print("---")
 
 
-def get_circuits_by_column(circuit):
-    """circuit-splitter.ipynb"""
+def get_circuits_by_column(circuit, by_barrier=False):
+    """
+    Splits a circuit by column.
+    :param circuit: a Qiskit circuit
+    :param by_barrier: if True, divide circuits by barriers
+    """
     # Get circuit metadata
     num_qubits = circuit.num_qubits
     num_clbits = circuit.num_clbits
@@ -119,15 +124,42 @@ def get_circuits_by_column(circuit):
             index = qubit.index
             curr_column[index] = curr_column[anchor_qubit]
 
-    # Build the subcircuits by column
+    # Build the sub-circuits by column
     sub_circuits = []
+    barrier_circuit = None  # circuit between barriers; only used if by_barrier is True
     for col in range(0, num_columns):
+        # sub_circuit is the circuit in this column only
         sub_circuit = QuantumCircuit(num_qubits, num_clbits)
+        barrier_found = False
         for (insn, qargs, cargs) in columns[col]:
+            if type(insn) == Barrier:
+                barrier_found = True
             sub_circuit.append(insn, qargs, cargs)
-        sub_circuits.append(sub_circuit)
 
-    assert len(sub_circuits) == num_columns
+        if by_barrier:
+            # Add this column to the barrier section circuit
+            if barrier_circuit is None:
+                # Is the first circuit in the barrier section
+                barrier_circuit = sub_circuit
+            else:
+                barrier_circuit.extend(sub_circuit)
+
+            # If barrier is found, build one sub-circuit up until this barrier
+            if barrier_found:
+                # Save the circuit up until this barrier
+                sub_circuits.append(barrier_circuit)
+                # Clear the circuit for the next barrier section
+                barrier_circuit = None
+        else:
+            sub_circuits.append(sub_circuit)
+
+    if by_barrier:
+        # Add the last column if not ended by a barrier
+        if barrier_circuit:
+            sub_circuits.append(barrier_circuit)
+    else:
+        assert len(sub_circuits) == num_columns
+
     return sub_circuits
 
 
@@ -160,7 +192,7 @@ def play_notes(notes, merge=True, plot=False, volume=1.0):
     :param plot: if True, display a graph of the frequencies
     """
     rate = 16000.0
-    duration = 1.25
+    duration = 0.50
     x = np.linspace(0.0, duration, int(rate * duration))
 
     if merge:
@@ -220,24 +252,29 @@ def play_notes_from_state_vector(state_vector, show_vectors=False, use_volume=Tr
     display(InvisibleAudio(y, rate=rate, autoplay=True))
 
 
-def get_note(phase):
+def get_note(phase, scale=c_scale, pi_division=4):
     """Return music note given a phase"""
-    # Round to the nearest multiple of pi/4
-    base = pi / 4
+    # Round to the nearest multiple of pi/pi_division
+    base = pi / pi_division
     key = round(base * round(phase / base), 2)
-    if key not in c_scale:
+
+    # Edge case where phase = -3.14
+    if key <= -3.14:
+        key = 0.0
+
+    if key not in scale:
         print(f"{key} not in scale!")
         return None
 
-    note = c_scale[key]
+    note = scale[key]
     return note
 
 
-def get_notes(state_vector):
+def get_notes(state_vector, scale=c_scale, pi_division=4):
     notes = []
     phases = get_phases(state_vector)
     for phase in phases:
-        notes.append(get_note(phase))
+        notes.append(get_note(phase, scale=scale, pi_division=pi_division))
 
     return notes
 

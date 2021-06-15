@@ -1,7 +1,7 @@
 from time import sleep
 from warnings import filterwarnings, resetwarnings
 
-from matplotlib._api.deprecation import MatplotlibDeprecationWarning
+# from matplotlib._api.deprecation import MatplotlibDeprecationWarning
 from IPython.display import display, clear_output, HTML
 from ipywidgets import widgets
 from qiskit import QuantumCircuit
@@ -14,10 +14,26 @@ from quantum_music.circuit_functions import (
     get_notes,
 )
 from quantum_music.display import get_output_widget
+from quantum_music.scales import get_scale
 
 
 class Jukebox:
-    def __init__(self, circuit: QuantumCircuit):
+    def __init__(
+        self,
+        circuit: QuantumCircuit,
+        start_note=("C5", 523.25),
+        pi_division=4,
+        by_barrier=False,
+    ):
+        """
+        :param circuit: the Qiskit circuit to play
+        :param start_note: the first note in the scale. The Jukebox is configured
+            to play the major scale starting from start_note
+        :param pi_division: the number of divisions in pi rotation.
+            Each division is a different pitch (musical note)
+        :param by_barrier: if True, play notes only at barriers.
+            Else, play at all columns of the circuit.
+        """
         self.index = 0
         self.circuit = circuit
         self.sub_circuits = None
@@ -25,10 +41,15 @@ class Jukebox:
         self.buttons = self.get_buttons()
         self.notes = []
 
+        # Adjust scale
+        self.scale = get_scale(start_note, pi_division=pi_division)
+        self.pi_division = pi_division
+
+        self.by_barrier = by_barrier
         self.load_circuit(circuit)
 
         # Ignore warnings that come from Qiskit visualizations
-        filterwarnings("ignore", category=MatplotlibDeprecationWarning)
+        filterwarnings("ignore")
         # Display UI controls
         self.display()
 
@@ -41,14 +62,24 @@ class Jukebox:
         clear_output(wait=True)
         self.display()
 
+    def get_current_state_vector(self):
+        """Returns the current column's state vector"""
+        return self.state_vectors[self.index]
+
+    def get_notes(self):
+        """Helper function"""
+        return get_notes(
+            self.state_vectors[self.index], scale=self.scale, pi_division=self.pi_division
+        )
+
     def load_circuit(self, circuit: QuantumCircuit):
         """Overwrite the current circuit with the new circuit"""
-        self.sub_circuits = get_circuits_by_column(circuit)
+        self.sub_circuits = get_circuits_by_column(circuit, by_barrier=self.by_barrier)
         self.state_vectors = get_cummulative_state_vectors(self.sub_circuits)
-        self.notes = get_notes(self.state_vectors[self.index])
+        self.notes = self.get_notes()
 
     def play(self, button):
-        self.notes = get_notes(self.state_vectors[self.index])
+        self.notes = self.get_notes()
         self.refresh_output()
         play_notes(self.notes)
 
@@ -64,7 +95,7 @@ class Jukebox:
         if self.index == 0:
             return
         self.index = 0
-        self.notes = get_notes(self.state_vectors[self.index])
+        self.notes = self.get_notes()
         self.refresh_output()
 
     def back(self, button):
@@ -112,8 +143,12 @@ class Jukebox:
         with circuit_output:
             # Entire circuit
             display(self.circuit.draw())
-            # One column
-            display(HTML(f"<h3>Column {self.index}</h3>"))
+            # One column/barrier section
+            if self.by_barrier:
+                label = "Barrier"
+            else:
+                label = "Column"
+            display(HTML(f"<h3>{label} {self.index}</h3>"))
             display(HTML(f"<p><b>Notes played</b>: {notes_str}</p>"))
             display(self.sub_circuits[self.index].draw())
 
