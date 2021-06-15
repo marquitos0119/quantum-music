@@ -24,7 +24,7 @@ class Jukebox:
         circuit: QuantumCircuit,
         start_note=("C5", 523.25),
         pi_division=4,
-        play_at_barriers=False,
+        only_barriers=False,
     ):
         """
         :param circuit: the Qiskit circuit to play
@@ -32,7 +32,7 @@ class Jukebox:
             to play the major scale starting from start_note
         :param pi_division: the number of divisions in pi rotation.
             Each division is a different pitch (musical note)
-        :param play_at_barriers: if True, play notes only at barriers.
+        :param only_barriers: if True, play notes only at barriers.
             Else, play at all columns of the circuit.
         """
         self.index = 0
@@ -46,6 +46,7 @@ class Jukebox:
         self.scale = get_scale(start_note, pi_division=pi_division)
         self.pi_division = pi_division
 
+        self.only_barriers = only_barriers
         self.load_circuit(circuit)
 
         # Ignore warnings that come from Qiskit visualizations
@@ -74,7 +75,7 @@ class Jukebox:
 
     def load_circuit(self, circuit: QuantumCircuit):
         """Overwrite the current circuit with the new circuit"""
-        self.sub_circuits = get_circuits_by_column(circuit)
+        self.sub_circuits = get_circuits_by_column(circuit, only_barriers=self.only_barriers)
         self.state_vectors = get_cummulative_state_vectors(self.sub_circuits)
         self.notes = self.get_notes()
 
