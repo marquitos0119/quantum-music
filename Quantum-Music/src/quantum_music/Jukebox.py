@@ -141,8 +141,13 @@ class Jukebox:
         circuit_output = get_output_widget()
         notes_str = ",".join([note[0] for note in self.notes])
         with circuit_output:
-            # Entire circuit
-            display(self.circuit.draw())
+            if len(self.sub_circuits) < 10:
+                # Entire circuit
+                display(self.circuit.draw())
+            else:
+                display(
+                    HTML('<p style="color:gray">(this circuit is too large to be displayed.)</p>')
+                )
             # One column/barrier section
             if self.by_barrier:
                 label = "Barrier"
