@@ -1,7 +1,7 @@
 from time import sleep
 from warnings import filterwarnings, resetwarnings
 
-#from matplotlib._api.deprecation import MatplotlibDeprecationWarning
+# from matplotlib._api.deprecation import MatplotlibDeprecationWarning
 from IPython.display import display, clear_output, HTML
 from ipywidgets import widgets
 from qiskit import QuantumCircuit
@@ -19,7 +19,22 @@ from quantum_music.scales import get_scale
 
 
 class Jukebox:
-    def __init__(self, circuit: QuantumCircuit, start_note=("C5", 523.25), pi_division=4):
+    def __init__(
+        self,
+        circuit: QuantumCircuit,
+        start_note=("C5", 523.25),
+        pi_division=4,
+        play_at_barriers=False,
+    ):
+        """
+        :param circuit: the Qiskit circuit to play
+        :param start_note: the first note in the scale. The Jukebox is configured
+            to play the major scale starting from start_note
+        :param pi_division: the number of divisions in pi rotation.
+            Each division is a different pitch (musical note)
+        :param play_at_barriers: if True, play notes only at barriers.
+            Else, play at all columns of the circuit.
+        """
         self.index = 0
         self.circuit = circuit
         self.sub_circuits = None
@@ -64,14 +79,14 @@ class Jukebox:
         self.notes = self.get_notes()
 
     def play(self, button):
-        circuit =  self.sub_circuits[self.index]
+        circuit = self.sub_circuits[self.index]
         for (insn, qargs, cargs) in circuit.data:
             if type(insn) == Barrier:
                 self.notes = self.get_notes()
                 self.refresh_output()
                 play_notes(self.notes)
                 print("barrier")
-                break;
+                break
 
     def play_all_from(self, button):
         for i in range(self.index, len(self.state_vectors)):
