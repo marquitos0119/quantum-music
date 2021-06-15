@@ -87,8 +87,12 @@ def print_vector(vector, comment=""):
     print("---")
 
 
-def get_circuits_by_column(circuit):
-    """circuit-splitter.ipynb"""
+def get_circuits_by_column(circuit, by_barrier=False):
+    """
+    Splits a circuit by column.
+    :param circuit: a Qiskit circuit
+    :param by_barrier: if True, divide circuits by barriers
+    """
     # Get circuit metadata
     num_qubits = circuit.num_qubits
     num_clbits = circuit.num_clbits
