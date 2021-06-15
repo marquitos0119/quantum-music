@@ -192,7 +192,7 @@ def play_notes(notes, merge=True, plot=False, volume=1.0):
     :param plot: if True, display a graph of the frequencies
     """
     rate = 16000.0
-    duration = 1.25
+    duration = 0.50
     x = np.linspace(0.0, duration, int(rate * duration))
 
     if merge:
