@@ -124,15 +124,42 @@ def get_circuits_by_column(circuit, by_barrier=False):
             index = qubit.index
             curr_column[index] = curr_column[anchor_qubit]
 
-    # Build the subcircuits by column
+    # Build the sub-circuits by column
     sub_circuits = []
+    barrier_circuit = None  # circuit between barriers; only used if by_barrier is True
     for col in range(0, num_columns):
+        # sub_circuit is the circuit in this column only
         sub_circuit = QuantumCircuit(num_qubits, num_clbits)
+        barrier_found = False
         for (insn, qargs, cargs) in columns[col]:
+            if type(insn) == Barrier:
+                barrier_found = True
             sub_circuit.append(insn, qargs, cargs)
-        sub_circuits.append(sub_circuit)
 
-    assert len(sub_circuits) == num_columns
+        if by_barrier:
+            # Add this column to the barrier section circuit
+            if barrier_circuit is None:
+                # Is the first circuit in the barrier section
+                barrier_circuit = sub_circuit
+            else:
+                barrier_circuit.extend(sub_circuit)
+
+            # If barrier is found, build one sub-circuit up until this barrier
+            if barrier_found:
+                # Save the circuit up until this barrier
+                sub_circuits.append(barrier_circuit)
+                # Clear the circuit for the next barrier section
+                barrier_circuit = None
+        else:
+            sub_circuits.append(sub_circuit)
+
+    if by_barrier:
+        # Add the last column if not ended by a barrier
+        if barrier_circuit:
+            sub_circuits.append(barrier_circuit)
+    else:
+        assert len(sub_circuits) == num_columns
+
     return sub_circuits
 
 
@@ -263,10 +290,6 @@ def get_cummulative_state_vectors(sub_circuits):
         unitary_matrix = get_unitary_matrix(sub_circuit)
 
         # Multiply this column's unitary matrix with previous state_vector
-        index = len(state_vectors) - 1
-        state_vector = np.matmul(unitary_matrix, state_vectors[index])
-        for (insn, qargs, cargs) in sub_circuit.data:
-            if type(insn) == Barrier:
-                state_vectors.append(state_vector)
+        state_vectors.append(np.matmul(unitary_matrix, state_vectors[i - 1]))
 
     return state_vectors

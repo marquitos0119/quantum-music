@@ -6,7 +6,6 @@ from IPython.display import display, clear_output, HTML
 from ipywidgets import widgets
 from qiskit import QuantumCircuit
 from qiskit.visualization import plot_state_qsphere
-from qiskit.circuit.barrier import Barrier
 
 from quantum_music.circuit_functions import (
     get_cummulative_state_vectors,
@@ -80,14 +79,9 @@ class Jukebox:
         self.notes = self.get_notes()
 
     def play(self, button):
-        circuit = self.sub_circuits[self.index]
-        for (insn, qargs, cargs) in circuit.data:
-            if type(insn) == Barrier:
-                self.notes = self.get_notes()
-                self.refresh_output()
-                play_notes(self.notes)
-                print("barrier")
-                break
+        self.notes = self.get_notes()
+        self.refresh_output()
+        play_notes(self.notes)
 
     def play_all_from(self, button):
         for i in range(self.index, len(self.state_vectors)):
@@ -149,8 +143,12 @@ class Jukebox:
         with circuit_output:
             # Entire circuit
             display(self.circuit.draw())
-            # One column
-            display(HTML(f"<h3>Column {self.index}</h3>"))
+            # One column/barrier section
+            if self.by_barrier:
+                label = "Barrier"
+            else:
+                label = "Column"
+            display(HTML(f"<h3>{label} {self.index}</h3>"))
             display(HTML(f"<p><b>Notes played</b>: {notes_str}</p>"))
             display(self.sub_circuits[self.index].draw())
 
