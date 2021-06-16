@@ -95,8 +95,9 @@ def get_circuits_by_column(circuit, by_barrier=False):
     # Get circuit metadata
     num_qubits = circuit.num_qubits
     if not circuit.num_clbits:
-        circuit.num_clbits = num_qubits
-    num_clbits = circuit.num_clbits
+        num_clbits = num_qubits
+    else:
+        num_clbits = circuit.num_clbits
     _, _, ops = _get_layered_instructions(circuit)
     num_columns = len(ops)
 
