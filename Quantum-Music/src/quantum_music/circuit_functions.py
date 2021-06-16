@@ -14,7 +14,6 @@ import matplotlib.pyplot as plt
 
 from quantum_music.scales import c_scale
 
-
 # Simulators
 state_vector_sim = Aer.get_backend("statevector_simulator")
 unitary_sim = Aer.get_backend("unitary_simulator")
@@ -182,10 +181,10 @@ class InvisibleAudio(Audio):
     def _repr_html_(self):
         audio = super()._repr_html_()
         audio = audio.replace("<audio", '<audio onended="this.parentNode.removeChild(this)"')
-        return f'<div style="display:none">{audio}</div>'
+        return f'<div id="audio_player" style="display:none">{audio}</div>'
 
 
-def play_notes(notes, merge=True, plot=False, volume=1.0, note_time=0.50):
+def play_notes(notes, merge=True, plot=False, volume=1.0, note_time=0.50, return_only=False):
     """
     :param notes: a list of tuples of form (note, frequency)
     :param merge: if True, play notes simultaneously, else sequentially
@@ -209,7 +208,11 @@ def play_notes(notes, merge=True, plot=False, volume=1.0, note_time=0.50):
             plot_sound(x, y, "chord", xlim=[0.10, 0.15])
 
         # Play sound and display widget
-        display(InvisibleAudio(y, rate=rate, autoplay=True))
+        play_audio = InvisibleAudio(y, rate=rate, autoplay=True)
+        if return_only:
+            return play_audio
+
+        display(play_audio)
 
     else:
         for (note, frequency) in notes:
