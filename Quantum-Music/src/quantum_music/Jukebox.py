@@ -1,8 +1,7 @@
 from time import sleep
 from warnings import filterwarnings, resetwarnings
 
-# from matplotlib._api.deprecation import MatplotlibDeprecationWarning
-from IPython.display import display, clear_output, HTML
+from IPython.display import display, HTML
 from ipywidgets import widgets, interactive
 from qiskit import QuantumCircuit
 from qiskit.visualization import plot_state_qsphere
@@ -149,14 +148,6 @@ class Jukebox:
         notes_str = ",".join([note[0] for note in self.notes])
         self.circuit_output.clear_output(wait=True)
         with self.circuit_output:
-            clear_output(wait=True)
-            if len(self.sub_circuits) < 15:
-                # Entire circuit
-                display(self.circuit.draw())
-            else:
-                display(
-                    HTML('<p style="color:gray">(this circuit is too large to be displayed.)</p>')
-                )
             # One column/barrier section
             if self.by_barrier:
                 label = "Barrier"
@@ -177,7 +168,19 @@ class Jukebox:
         self.circuit_output = get_output_widget()
         self.qsphere_output = get_output_widget()
         self.update_visual_display()
-        display(widgets.HBox([self.circuit_output, self.qsphere_output]))
+        entire_circuit_display = get_output_widget()
+        with entire_circuit_display:
+            if len(self.sub_circuits) < 15:
+                display(self.circuit.draw())
+            else:
+                display(
+                    HTML('<p style="color:gray">(this circuit is too large to be displayed.)</p>')
+                )
+        display(
+            widgets.HBox(
+                [widgets.VBox([self.circuit_output, self.qsphere_output]), entire_circuit_display]
+            )
+        )
 
         # Play, forward, back buttons
         buttons = widgets.HBox(self.buttons)
@@ -186,7 +189,7 @@ class Jukebox:
         # Audio controls
         audio_controls_label = widgets.HTML("<p><b>Duration</b></p>")
         rest_slider = interactive(self.set_rest_time, rest=(0.0, 1.0))
-        note_slider = interactive(self.set_note_time, note=(0.0, 1.0))
+        note_slider = interactive(self.set_note_time, note=(0.10, 1.0))
         display(
             widgets.HBox(
                 [
