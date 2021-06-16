@@ -185,14 +185,14 @@ class InvisibleAudio(Audio):
         return f'<div style="display:none">{audio}</div>'
 
 
-def play_notes(notes, merge=True, plot=False, volume=1.0):
+def play_notes(notes, merge=True, plot=False, volume=1.0, note_time=0.50):
     """
     :param notes: a list of tuples of form (note, frequency)
     :param merge: if True, play notes simultaneously, else sequentially
     :param plot: if True, display a graph of the frequencies
     """
     rate = 16000.0
-    duration = 0.50
+    duration = note_time
     x = np.linspace(0.0, duration, int(rate * duration))
 
     if merge:

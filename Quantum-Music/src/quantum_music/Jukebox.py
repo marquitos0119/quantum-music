@@ -1,9 +1,8 @@
 from time import sleep
 from warnings import filterwarnings, resetwarnings
 
-# from matplotlib._api.deprecation import MatplotlibDeprecationWarning
-from IPython.display import display, clear_output, HTML
-from ipywidgets import widgets
+from IPython.display import display, HTML
+from ipywidgets import widgets, interactive
 from qiskit import QuantumCircuit
 from qiskit.visualization import plot_state_qsphere
 
@@ -41,6 +40,10 @@ class Jukebox:
         self.buttons = self.get_buttons()
         self.notes = []
 
+        # Length of time for rests (between notes) and note
+        self.rest_time = 0.0
+        self.note_time = 1.0
+
         # Adjust scale
         self.scale = get_scale(start_note, pi_division=pi_division)
         self.pi_division = pi_division
@@ -50,17 +53,15 @@ class Jukebox:
 
         # Ignore warnings that come from Qiskit visualizations
         filterwarnings("ignore")
+
         # Display UI controls
-        self.display()
+        self.circuit_output = None
+        self.qsphere_output = None
+        self.init_display()
 
     def __del__(self):
         # Re-enable warnings from Qiskit visualizations
         resetwarnings()
-
-    def refresh_output(self):
-        """Removes previous output and refreshes the button controls"""
-        clear_output(wait=True)
-        self.display()
 
     def get_current_state_vector(self):
         """Returns the current column's state vector"""
@@ -78,17 +79,25 @@ class Jukebox:
         self.state_vectors = get_cummulative_state_vectors(self.sub_circuits)
         self.notes = self.get_notes()
 
+    # Audio controls
+    def set_rest_time(self, rest):
+        self.rest_time = rest
+
+    def set_note_time(self, note):
+        self.note_time = note
+
+    # Playback buttons
     def play(self, button):
         self.notes = self.get_notes()
-        self.refresh_output()
-        play_notes(self.notes)
+        self.update_visual_display()
+        play_notes(self.notes, note_time=self.note_time)
 
     def play_all_from(self, button):
         for i in range(self.index, len(self.state_vectors)):
-            self.refresh_output()
+            self.update_visual_display()
             self.index = i
             self.play(button)
-            sleep(1)
+            sleep(self.rest_time)
 
     def restart(self, button):
         """Moves back to the first column"""
@@ -96,19 +105,19 @@ class Jukebox:
             return
         self.index = 0
         self.notes = self.get_notes()
-        self.refresh_output()
+        self.update_visual_display()
 
     def back(self, button):
         if self.index == 0:
             return
-        self.refresh_output()
+        self.update_visual_display()
         self.index -= 1
         self.play(button)
 
     def forward(self, button):
         if self.index == len(self.sub_circuits) - 1:
             return
-        self.refresh_output()
+        self.update_visual_display()
         self.index += 1
         self.play(button)
 
@@ -134,20 +143,12 @@ class Jukebox:
         # Defines the display order from left to right
         return [play_all_from_button, restart_button, back_button, play_button, forward_button]
 
-    def display(self):
-        """Display the audio controls UI"""
-
+    def update_visual_display(self):
         # Left HBox
-        circuit_output = get_output_widget()
         notes_str = ",".join([note[0] for note in self.notes])
-        with circuit_output:
-            if len(self.sub_circuits) < 15:
-                # Entire circuit
-                display(self.circuit.draw())
-            else:
-                display(
-                    HTML('<p style="color:gray">(this circuit is too large to be displayed.)</p>')
-                )
+        self.circuit_output.clear_output(wait=True)
+        with self.circuit_output:
+            display(HTML("<h2>Current State</h2>"))
             # One column/barrier section
             if self.by_barrier:
                 label = "Barrier"
@@ -158,11 +159,45 @@ class Jukebox:
             display(self.sub_circuits[self.index].draw())
 
         # Right HBox
-        qsphere_output = get_output_widget()
-        with qsphere_output:
+        self.qsphere_output.clear_output(wait=True)
+        with self.qsphere_output:
             display(plot_state_qsphere(self.state_vectors[self.index]))
-        display(widgets.HBox([circuit_output, qsphere_output]))
 
-        # Control buttons
+    def init_display(self):
+        """Display the audio controls UI"""
+        # Setup visual display
+        self.circuit_output = get_output_widget()
+        self.qsphere_output = get_output_widget()
+        self.update_visual_display()
+        entire_circuit_display = get_output_widget()
+        with entire_circuit_display:
+            display(HTML("<h2>Quantum Circuit</h2>"))
+            if len(self.sub_circuits) < 15:
+                display(self.circuit.draw())
+            else:
+                display(
+                    HTML('<p style="color:gray">(this circuit is too large to be displayed.)</p>')
+                )
+        display(
+            widgets.HBox(
+                [entire_circuit_display, widgets.VBox([self.circuit_output, self.qsphere_output])]
+            )
+        )
+
+        # Play, forward, back buttons
         buttons = widgets.HBox(self.buttons)
         display(buttons)
+
+        # Audio controls
+        audio_controls_label = widgets.HTML("<p><b>Duration</b></p>")
+        rest_slider = interactive(self.set_rest_time, rest=(0.0, 1.0))
+        note_slider = interactive(self.set_note_time, note=(0.10, 1.0))
+        display(
+            widgets.HBox(
+                [
+                    audio_controls_label,
+                    rest_slider,
+                    note_slider,
+                ]
+            )
+        )
