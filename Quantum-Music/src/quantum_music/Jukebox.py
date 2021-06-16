@@ -148,6 +148,7 @@ class Jukebox:
         notes_str = ",".join([note[0] for note in self.notes])
         self.circuit_output.clear_output(wait=True)
         with self.circuit_output:
+            display(HTML("<h2>Current State</h2>"))
             # One column/barrier section
             if self.by_barrier:
                 label = "Barrier"
@@ -170,6 +171,7 @@ class Jukebox:
         self.update_visual_display()
         entire_circuit_display = get_output_widget()
         with entire_circuit_display:
+            display(HTML("<h2>Quantum Circuit</h2>"))
             if len(self.sub_circuits) < 15:
                 display(self.circuit.draw())
             else:
@@ -178,7 +180,7 @@ class Jukebox:
                 )
         display(
             widgets.HBox(
-                [widgets.VBox([self.circuit_output, self.qsphere_output]), entire_circuit_display]
+                [entire_circuit_display, widgets.VBox([self.circuit_output, self.qsphere_output])]
             )
         )
 
