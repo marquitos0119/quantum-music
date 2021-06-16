@@ -82,10 +82,10 @@ class Jukebox:
         self.notes = self.get_notes()
 
     # Audio controls
-    def set_rest_time(self, rest):
+    def set_rest_time(self, rest=0.0):
         self.rest_time = rest
 
-    def set_note_time(self, note):
+    def set_note_time(self, note=0.50):
         self.note_time = note
 
     # Playback buttons
@@ -151,7 +151,6 @@ class Jukebox:
 
     def update_visual_display(self):
         # Left HBox
-        notes_str = ",".join([note[0] for note in self.notes])
         self.circuit_output.clear_output(wait=True)
         with self.circuit_output:
             display(HTML("<h2>Current State</h2>"))
@@ -161,7 +160,11 @@ class Jukebox:
             else:
                 label = "Column"
             display(HTML(f"<h3>{label} {self.index}</h3>"))
-            display(HTML(f"<p><b>Notes played</b>: {notes_str}</p>"))
+
+            if len(self.notes) <= 8:
+                notes_str = ",".join([note[0] for note in self.notes])
+                display(HTML(f"<p><b>Notes played</b>: {notes_str}</p>"))
+
             display(self.sub_circuits[self.index].draw())
 
         # Right HBox
