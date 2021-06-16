@@ -147,7 +147,7 @@ class Jukebox:
         return [play_all_from_button, restart_button, back_button, play_button, forward_button]
 
     def update_visual_display(self):
-        # Left HBox
+
         self.circuit_output.clear_output(wait=True)
         with self.circuit_output:
             display(HTML("<h2>Current State</h2>"))
@@ -164,7 +164,6 @@ class Jukebox:
 
             display(self.sub_circuits[self.index].draw())
 
-        # Right HBox
         self.qsphere_output.clear_output(wait=True)
         with self.qsphere_output:
             display(plot_state_qsphere(self.state_vectors[self.index]))
