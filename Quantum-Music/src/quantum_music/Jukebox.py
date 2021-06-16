@@ -21,7 +21,7 @@ class Jukebox:
         self,
         circuit: QuantumCircuit,
         start_note=("C5", 523.25),
-        pi_division=4,
+        pi_division=8,
         by_barrier=False,
     ):
         """
