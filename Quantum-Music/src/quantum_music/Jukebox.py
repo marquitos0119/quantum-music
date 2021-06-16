@@ -100,7 +100,6 @@ class Jukebox:
 
     def play_all_from(self, button):
         for i in range(self.index, len(self.state_vectors)):
-            self.update_visual_display()
             self.index = i
             self.play(button)
             sleep(self.rest_time)
@@ -116,14 +115,12 @@ class Jukebox:
     def back(self, button):
         if self.index == 0:
             return
-        self.update_visual_display()
         self.index -= 1
         self.play(button)
 
     def forward(self, button):
         if self.index == len(self.sub_circuits) - 1:
             return
-        self.update_visual_display()
         self.index += 1
         self.play(button)
 
