@@ -3,7 +3,7 @@ from warnings import filterwarnings, resetwarnings
 
 # from matplotlib._api.deprecation import MatplotlibDeprecationWarning
 from IPython.display import display, clear_output, HTML
-from ipywidgets import widgets
+from ipywidgets import widgets, interactive
 from qiskit import QuantumCircuit
 from qiskit.visualization import plot_state_qsphere
 
@@ -40,6 +40,10 @@ class Jukebox:
         self.state_vectors = None
         self.buttons = self.get_buttons()
         self.notes = []
+
+        # Length of time for rests (between notes) and note
+        self.rest_time = 0.0
+        self.note_time = 1.0
 
         # Adjust scale
         self.scale = get_scale(start_note, pi_division=pi_division)
@@ -78,6 +82,14 @@ class Jukebox:
         self.state_vectors = get_cummulative_state_vectors(self.sub_circuits)
         self.notes = self.get_notes()
 
+    # Audio controls
+    def set_rest_time(self, rest):
+        self.rest_time = rest
+
+    def set_note_time(self, note):
+        self.note_time = note
+
+    # Playback buttons
     def play(self, button):
         self.notes = self.get_notes()
         self.refresh_output()
@@ -163,6 +175,20 @@ class Jukebox:
             display(plot_state_qsphere(self.state_vectors[self.index]))
         display(widgets.HBox([circuit_output, qsphere_output]))
 
-        # Control buttons
+        # Play, forward, back buttons
         buttons = widgets.HBox(self.buttons)
         display(buttons)
+
+        # Audio controls
+        audio_controls_label = widgets.HTML("<p><b>Duration</b></p>")
+        rest_slider = interactive(self.set_rest_time, rest=(0.0, 1.0))
+        note_slider = interactive(self.set_note_time, note=(0.0, 1.0))
+        display(
+            widgets.HBox(
+                [
+                    audio_controls_label,
+                    rest_slider,
+                    note_slider,
+                ]
+            )
+        )
