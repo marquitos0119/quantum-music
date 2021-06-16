@@ -57,6 +57,8 @@ class Jukebox:
         # Display UI controls
         self.circuit_output = None
         self.qsphere_output = None
+        self.audio_buffer = None
+        self.audio_widget = None
         self.init_display()
 
     def __del__(self):
@@ -90,7 +92,11 @@ class Jukebox:
     def play(self, button):
         self.notes = self.get_notes()
         self.update_visual_display()
-        play_notes(self.notes, note_time=self.note_time)
+
+        self.audio_buffer.clear_output(wait=True)
+        self.audio_widget = play_notes(self.notes, note_time=self.note_time, return_only=True)
+        with self.audio_buffer:
+            display(self.audio_widget)
 
     def play_all_from(self, button):
         for i in range(self.index, len(self.state_vectors)):
@@ -201,3 +207,10 @@ class Jukebox:
                 ]
             )
         )
+
+        # Use invisible placeholder
+        self.audio_widget = widgets.HTML('<span style="display:none"></span>')
+        self.audio_buffer = get_output_widget()
+        with self.audio_buffer:
+            display(self.audio_widget)
+        display(widgets.HBox([self.audio_buffer]))
